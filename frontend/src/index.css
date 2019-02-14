@@ -1,0 +1,40 @@
+body{
+	text-align: center;
+	background-color: grey;
+}
+
+#root {
+	height: 100%;
+	width: 100%;
+	padding: 10px;
+}
+
+.network {
+	display: inline-block;
+	height: 600px;
+	width: 90%;
+}
+
+.layer-rows {
+	width: 100%;
+	table-layout:fixed;
+}
+
+.neuron {
+	padding: 10px;
+}
+
+.layer-buttons {
+	padding: 10px;
+}
+
+.network-buttons {
+	padding: 10px;
+}
+
+canvas {
+	width: 35px;
+	height: 35px;
+	background-color: red;
+	border: 3px solid black;
+}

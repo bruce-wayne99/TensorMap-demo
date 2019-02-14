@@ -1,5 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import LeaderLine from 'leader-line';
+import * as d3 from 'd3';
+import $ from "jquery";
+import './bootswatch.min.css';
+import './index.css';
 
 class Button extends React.Component {
 
@@ -13,70 +18,127 @@ class Button extends React.Component {
 
 	render() {
 		return (
-			<button> {this.state.type} {this.state.value} </button>
-		);
-	}
-}
-
-class Neuron extends React.Component {
-
-	render () {
-		return (
-			<div> Neuron {this.props.value} </div>
+			<button type="button" class="btn btn-success" onClick={() => this.props.onClick()}> {this.props.value} </button>
 		);
 	}
 }
 
 class Layer extends React.Component {
 
-	renderNeuron(i) {
-		return <Neuron value={i}/>
+	constructor(props) {
+		super(props);
+		this.state = {
+			neurons: props.neurons,
+			id: props.value
+		}
 	}
 
-	renderButton(type, value) {
-		return <Button type={type} value={value}/>
+	addNeuron() {
+		//increase layer count
+		this.setState({neurons: this.state.neurons+1});
+		return;
+	}
+
+	removeNeuron() {
+		//decrease layer count
+		if(this.state.neurons > 1) {
+			this.setState({neurons: this.state.neurons-1});
+		}
+		return;
+	}
+
+	renderNeuron(i) {
+		return (
+			<div class="neuron" id={'nr' + this.props.pid + '_' + this.state.id + '_' + i}>
+				<canvas></canvas>
+			</div> 
+		);
+	}
+
+	renderNeurons() {
+		var neurons = []
+		for(var i = 0; i < this.state.neurons; i++) {
+			neurons.push(this.renderNeuron(i));
+		}
+		return neurons;
 	}
 
 	render() {
 		return (
-			<div class="layer">
-				<div class="layer-title"> Layer {this.props.value} </div>
-				<div class="layer-buttons">
-					{this.renderButton('neuron', '+')}
-					{this.renderButton('neuron', '-')}
+			<td>
+				<div class="layer" id={'l' + this.props.pid + '_' + this.state.id}>
+					<div class="layer-title"> Layer {this.props.value} {this.state.neurons} </div>
+					<div class="layer-buttons">
+						<Button type={'neuron'} value={'+'} onClick={() => this.addNeuron()}/>
+						&nbsp;
+						<Button type={'neuron'} value={'-'} onClick={() => this.removeNeuron()}/>
+					</div>
+					<div class="neuron-column">
+						{this.renderNeurons()}
+					</div> 
 				</div>
-				<div class="neuron-rows">
-					{this.renderNeuron(0)}
-					{this.renderNeuron(1)}
-					{this.renderNeuron(2)}
-				</div> 
-			</div>
+			</td>
 		);
 	}
 }
 
 class Network extends React.Component {
 
-	renderButton(type, value) {
-		return <Button type={type} value={value}/>
+	constructor(props) {
+		super(props);
+		this.state = {
+			layers: props.layers,
+			id: props.id
+		}
 	}
 
-	renderLayer(i) {
-		return <Layer value={i}/>
+	componentDidUpdate() {
+		// for(var i = 1; i < this.state.layers; i++) {
+		// 	drawLinksFromLayerToLayer(this.state.id, i-1, i);
+		// }
+	}
+
+	addLayer() {
+		//increase layer count
+		this.setState({layers: this.state.layers+1});
+		return;
+	}
+
+	removeLayer() {
+		//decrease layer count
+		if(this.state.layers > 1) {
+			this.setState({layers: this.state.layers-1});
+		}
+		return;
+	}
+
+	renderLayer(i, neurons) {
+		return <Layer value={i} neurons={neurons} pid={this.state.id}/>;
+	}
+
+	renderLayers() {
+		var layers = []
+		for(var i = 0; i < this.state.layers; i++) {
+			layers.push(this.renderLayer(i, 2));
+		}
+		return layers;
 	}
 
 	render() {
 		return (
-			<div class="network">
+			<div class="network" id={'n' + this.state.id}>
 				<div class="network-title">Network Component!</div>
 				<div class="network-buttons">
-					{this.renderButton('layer', '+')}
-					{this.renderButton('layer', '-')}
+					<Button type={'layer'} value={'+'} onClick={() => this.addLayer()}/>
+					&nbsp;
+					<Button type={'layer'} value={'-'} onClick={() => this.removeLayer()}/>
 				</div>
-				<div class="layer-rows">
-					{this.renderLayer(0)}
-					{this.renderLayer(1)}
-					{this.renderLayer(2)}
+				<table class="layer-rows table">
+					<tr>
+						{this.renderLayers()}
+					</tr>
+				</table>
+				<div class="network-links" id={'link' + this.state.id}>
 				</div>
 			</div>
 		);
@@ -85,6 +147,6 @@ class Network extends React.Component {
 
 
 ReactDOM.render(
-	<Network/>,
+	<Network layers={1} id={0}/>,
 	document.getElementById('root')
 );
