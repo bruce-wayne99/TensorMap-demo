@@ -13,6 +13,7 @@ body{
 	display: inline-block;
 	height: 600px;
 	width: 90%;
+	position: relative;
 }
 
 .layer-rows {
@@ -37,4 +38,11 @@ canvas {
 	height: 35px;
 	background-color: red;
 	border: 3px solid black;
+}
+
+/*Styling for SVG elements*/
+
+svg {
+	z-index: -1;
+	position: absolute;
 }

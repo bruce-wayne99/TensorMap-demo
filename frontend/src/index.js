@@ -2,8 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import LeaderLine from 'leader-line';
 import * as d3 from 'd3';
-import $ from "jquery";
 import './bootswatch.min.css';
+import $ from 'jquery';
 import './index.css';
 
 class Button extends React.Component {
@@ -33,9 +33,15 @@ class Layer extends React.Component {
 		}
 	}
 
+	componentDidUpdate() {
+		drawNeuronsPerLayer(this.props.pid, this.state.id);
+	}
+
 	addNeuron() {
 		//increase layer count
-		this.setState({neurons: this.state.neurons+1});
+		if(this.state.neurons < 5) {
+			this.setState({neurons: this.state.neurons+1});
+		}
 		return;
 	}
 
@@ -93,14 +99,16 @@ class Network extends React.Component {
 	}
 
 	componentDidUpdate() {
-		// for(var i = 1; i < this.state.layers; i++) {
-		// 	drawLinksFromLayerToLayer(this.state.id, i-1, i);
-		// }
+		drawSVG(this.state.id);
+		drawNeurons(this.state.id, this.state.layers);
+		drawLinks(this.state.id, this.state.layers);
 	}
 
 	addLayer() {
 		//increase layer count
-		this.setState({layers: this.state.layers+1});
+		if (this.state.layers < 5) {
+			this.setState({layers: this.state.layers+1});
+		}
 		return;
 	}
 
@@ -138,8 +146,7 @@ class Network extends React.Component {
 						{this.renderLayers()}
 					</tr>
 				</table>
-				<div class="network-links" id={'link' + this.state.id}>
-				</div>
+				<svg id={'svg' + this.state.id}></svg>
 			</div>
 		);
 	}
@@ -150,3 +157,43 @@ ReactDOM.render(
 	<Network layers={1} id={0}/>,
 	document.getElementById('root')
 );
+
+function drawSVG(network_id) {
+	var divEle = $('#n' + network_id)[0].getBoundingClientRect();
+	d3.select('#svg' + network_id).selectAll("*").remove();
+	var svgEle = d3.select('#svg' + network_id);
+	svgEle.style("left", 0 + "px");
+	svgEle.style("top", 0 + "px");
+	svgEle.style("width", 100 + "%");
+	svgEle.style("height", 100 + "%");
+}	
+
+function drawNeurons(network_id, layers) {
+	for(var i = 0; i < layers; i++) {
+		drawNeuronsPerLayer(network_id, i);
+	}
+}
+
+function drawNeuronsPerLayer(network_id, layer_id) {
+	d3.select('#svg' + network_id).selectAll("#g" + network_id + '_' + layer_id).remove();
+	var svgEle = d3.select('#svg' + network_id);
+	var divEle = $('#n' + network_id)[0].getBoundingClientRect();
+	var neurons = d3.select('#l' + network_id + '_' + layer_id).selectAll('canvas').nodes();
+	var group = svgEle.append("g").attr("id", 'g' + network_id + '_' + layer_id);
+	neurons.forEach(function(neuron) {
+		let cx = (neuron.getBoundingClientRect().left - divEle.left)/divEle.width;
+		let cy = (neuron.getBoundingClientRect().top - divEle.top)/divEle.height;
+		group.append("rect").attr("x", cx*100 + '%').attr("y", cy*100 + '%').attr("width", 35).attr("height", 35);
+	});
+}
+
+function drawLinks(network_id, layers) {
+	for(var i = 1; i < layers; i++) {
+		drawLinkBetweenLayers(network_id, i - 1, i);
+	}
+}
+
+function drawLinkBetweenLayers(network_id, layer1_id, layer2_id) {
+	d3.select('#svg' + network_id).selectAll("#g" + network_id + '_' + layer1_id + '_' + layer2_id).remove();
+	var svgEle = d3.select('#svg' + network_id);
+}
