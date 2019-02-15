@@ -35,6 +35,12 @@ class Layer extends React.Component {
 
 	componentDidUpdate() {
 		drawNeuronsPerLayer(this.props.pid, this.state.id);
+		if(this.state.id >= 1) {
+			drawLinkBetweenLayers(this.props.pid, this.state.id-1, this.state.id);
+		}
+		if(this.state.id <= 3) {
+			drawLinkBetweenLayers(this.props.pid, this.state.id, this.state.id + 1);
+		}
 	}
 
 	addNeuron() {
@@ -181,9 +187,9 @@ function drawNeuronsPerLayer(network_id, layer_id) {
 	var neurons = d3.select('#l' + network_id + '_' + layer_id).selectAll('canvas').nodes();
 	var group = svgEle.append("g").attr("id", 'g' + network_id + '_' + layer_id);
 	neurons.forEach(function(neuron) {
-		let cx = (neuron.getBoundingClientRect().left - divEle.left)/divEle.width;
-		let cy = (neuron.getBoundingClientRect().top - divEle.top)/divEle.height;
-		group.append("rect").attr("x", cx*100 + '%').attr("y", cy*100 + '%').attr("width", 35).attr("height", 35);
+		let cx = (neuron.getBoundingClientRect().left - divEle.left);
+		let cy = (neuron.getBoundingClientRect().top - divEle.top);
+		group.append("rect").attr("x", cx).attr("y", cy).attr("width", 35).attr("height", 35);
 	});
 }
 
@@ -196,4 +202,32 @@ function drawLinks(network_id, layers) {
 function drawLinkBetweenLayers(network_id, layer1_id, layer2_id) {
 	d3.select('#svg' + network_id).selectAll("#g" + network_id + '_' + layer1_id + '_' + layer2_id).remove();
 	var svgEle = d3.select('#svg' + network_id);
+	var divEle = $('#n' + network_id)[0].getBoundingClientRect();
+	var neurons1 = svgEle.select('#g' + network_id + '_' + layer1_id).selectAll('rect').nodes();
+	var neurons2 = svgEle.select('#g' + network_id + '_' + layer2_id).selectAll('rect').nodes();
+	var group = svgEle.append("g").attr("id", 'g' + network_id + '_' + layer1_id + '_' + layer2_id);
+	console.log(neurons1, neurons2);
+	for(var i = 0; i < neurons1.length; i++) {
+		for(var j = 0; j < neurons2.length; j++) {
+			group.append("path").attr("stroke", "blue").attr("stroke-width","1").attr("fill","none")
+				 .attr("d", getCurvePath(neurons1[i], neurons2[j]));
+			// console.log(neurons1[i].getAttribute("x"), neurons1[i].getAttribute("y"));
+			// console.log(neurons2[j].getAttribute("x"), neurons2[j].getAttribute("y"));
+			// console.log("Done");
+		}
+	}
+}
+
+function getCurvePath(ele1, ele2) {
+	let width = 35;
+	let cx1 = parseFloat(ele1.getAttribute("x"));
+	let cy1 = parseFloat(ele1.getAttribute("y"));
+	let cx2 = parseFloat(ele2.getAttribute("x"));
+	let cy2 = parseFloat(ele2.getAttribute("y"));
+	cx1 += width; cy1 += width/2; cy2 += width/2;
+
+	let px1 = cx1, py1 = cy1;
+	let px2 = (cx2-cx1)/2, py2 = (cy2-cy1)/2;
+	let px3 = (cx2-cx1), py3 = (cy2-cy1);
+	return "M " + px1 + " " + py1 + " q " + px2 + " " + py2 + " " + px3 + " " + py3;
 }
