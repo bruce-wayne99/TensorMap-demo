@@ -113,7 +113,7 @@ class Layer extends React.Component {
 		return (
 			<td>
 				<div class="layer" id={'l' + this.props.pid + '_' + this.state.id}>
-					<div class="layer-title"> Layer {this.props.value} {this.state.neurons} </div>
+					<div class="layer-title"> Layer {this.props.value + 1} </div>
 					<div class="layer-buttons">
 						<Button type={'neuron'} value={'+'} onClick={() => this.addNeuron()}/>
 						&nbsp;
@@ -190,7 +190,7 @@ class Network extends React.Component {
 				</div>
 				</td><td class="network-col">
 				<div class="network" id={'n' + this.state.id}>
-					<div class="network-title">Network Component!</div>
+					<h5>Neural Network</h5>
 					<div class="network-buttons">
 						<Button type={'layer'} value={'+'} onClick={() => this.addLayer()}/>
 						&nbsp;
