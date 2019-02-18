@@ -23,6 +23,40 @@ class Button extends React.Component {
 	}
 }
 
+
+class Params extends React.Component {
+
+	constructor(props) {
+		super(props);
+		this.state = {
+			pid: this.props.pid,
+			title: this.props.title,
+			values: this.props.values
+		};
+	}
+
+	renderSelect(options) {
+		var options_arr = [];
+		for(var i = 0; i < options.length; i++) {
+			options_arr.push(<option>{options[i]}</option>)
+		}
+		return (
+			<select class="form-control">
+				{options_arr}
+			</select>
+		);
+	}
+
+	render() {
+		return (
+			<div class="form-group">
+      			<label>{this.state.title}</label>
+				{this.renderSelect(this.state.values)}
+    		</div>
+		);
+	}
+}
+
 class Layer extends React.Component {
 
 	constructor(props) {
@@ -138,22 +172,39 @@ class Network extends React.Component {
 		return layers;
 	}
 
+	renderParams(title, values) {
+		return <Params title={title} values={values} pid={this.state.id}/>
+	}
+
 	render() {
 		return (
-			<div class="network" id={'n' + this.state.id}>
-				<div class="network-title">Network Component!</div>
-				<div class="network-buttons">
-					<Button type={'layer'} value={'+'} onClick={() => this.addLayer()}/>
-					&nbsp;
-					<Button type={'layer'} value={'-'} onClick={() => this.removeLayer()}/>
+			<table class="table" id={'t' + this.state.id}>
+				<tr><td class="params-col">
+				<div class="jumbotron">
+    				<h4>Network Parameters</h4>
+					{this.renderParams("Learning rate", [0.03, 0.01, 0.02])}
+					{this.renderParams("Activation", ["Tanh", "Linear", "Relu"])}
+					{this.renderParams("Regularization", ["None", "L1", "L2"])}
+					{this.renderParams("Regularization rate", [0.003, 0.001, 0.02])}
+					{this.renderParams("Problem type", ["Regression", "Classification"])}
 				</div>
-				<table class="layer-rows table">
-					<tr>
-						{this.renderLayers()}
-					</tr>
-				</table>
-				<svg id={'svg' + this.state.id}></svg>
-			</div>
+				</td><td class="network-col">
+				<div class="network" id={'n' + this.state.id}>
+					<div class="network-title">Network Component!</div>
+					<div class="network-buttons">
+						<Button type={'layer'} value={'+'} onClick={() => this.addLayer()}/>
+						&nbsp;
+						<Button type={'layer'} value={'-'} onClick={() => this.removeLayer()}/>
+					</div>
+					<table class="layer-rows table">
+						<tr>
+							{this.renderLayers()}
+						</tr>
+					</table>
+					<svg id={'svg' + this.state.id}></svg>
+				</div>
+				</td></tr>
+			</table>
 		);
 	}
 }
@@ -206,14 +257,12 @@ function drawLinkBetweenLayers(network_id, layer1_id, layer2_id) {
 	var neurons1 = svgEle.select('#g' + network_id + '_' + layer1_id).selectAll('rect').nodes();
 	var neurons2 = svgEle.select('#g' + network_id + '_' + layer2_id).selectAll('rect').nodes();
 	var group = svgEle.append("g").attr("id", 'g' + network_id + '_' + layer1_id + '_' + layer2_id);
+	group.attr("stroke", "orange");
 	console.log(neurons1, neurons2);
 	for(var i = 0; i < neurons1.length; i++) {
 		for(var j = 0; j < neurons2.length; j++) {
-			group.append("path").attr("stroke", "blue").attr("stroke-width","1").attr("fill","none")
+			group.append("path").attr("stroke-dasharray", "5,5").attr("stroke-width","3").attr("fill","none")
 				 .attr("d", getCurvePath(neurons1[i], neurons2[j]));
-			// console.log(neurons1[i].getAttribute("x"), neurons1[i].getAttribute("y"));
-			// console.log(neurons2[j].getAttribute("x"), neurons2[j].getAttribute("y"));
-			// console.log("Done");
 		}
 	}
 }

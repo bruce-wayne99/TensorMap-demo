@@ -1,18 +1,15 @@
 body{
 	text-align: center;
-	background-color: grey;
+	/*background-color:  #FF851B;*/
 }
 
-#root {
-	height: 100%;
-	width: 100%;
-	padding: 10px;
+.params-col {
+	width: 20%;
 }
 
 .network {
-	display: inline-block;
 	height: 600px;
-	width: 90%;
+	width: 100%;
 	position: relative;
 }
 
@@ -37,7 +34,7 @@ canvas {
 	width: 35px;
 	height: 35px;
 	background-color: red;
-	border: 3px solid black;
+	border: 2px solid black;
 }
 
 /*Styling for SVG elements*/
