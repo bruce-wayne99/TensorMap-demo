@@ -48,8 +48,12 @@ class Network extends React.Component {
 		return layers;
 	}
 
-	renderParams(title, values) {
-		return <Params title={title} values={values} pid={this.state.id}/>
+	renderParams(title, values, tag) {
+		return <Params title={title} values={values} pid={this.state.id} tag={tag}/>
+	}
+
+	sendNetwork() {
+		utils.sendNetwork(this.state.id);
 	}
 
 	render() {
@@ -58,11 +62,12 @@ class Network extends React.Component {
 				<tr><td class="params-col">
 				<div class="jumbotron">
     				<h4>Network Parameters</h4>
-					{this.renderParams("Learning rate", [0.03, 0.01, 0.02])}
-					{this.renderParams("Activation", ["Tanh", "Linear", "Relu"])}
-					{this.renderParams("Regularization", ["None", "L1", "L2"])}
-					{this.renderParams("Regularization rate", [0.003, 0.001, 0.02])}
-					{this.renderParams("Problem type", ["Regression", "Classification"])}
+					{this.renderParams("Learning rate", [0.03, 0.01, 0.02], "lr")}
+					{this.renderParams("Activation", ["tanh", "linear", "relu"], "afunc")}
+					{this.renderParams("Regularization", ["None", "l1", "l2"], "rfunc")}
+					{this.renderParams("Regularization rate", [0.003, 0.001, 0.02], "rr")}
+					{this.renderParams("Problem type", ["Classification"], "ptype")}
+					<button class="btn btn-primary" onClick={() => this.sendNetwork()}>Submit</button>
 				</div>
 				</td><td class="network-col">
 				<div class="network" id={'n' + this.state.id}>

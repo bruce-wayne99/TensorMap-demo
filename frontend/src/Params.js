@@ -17,7 +17,7 @@ class Params extends React.Component {
 			options_arr.push(<option>{options[i]}</option>)
 		}
 		return (
-			<select class="form-control">
+			<select class="form-control" id={this.props.tag + this.state.pid}>
 				{options_arr}
 			</select>
 		);

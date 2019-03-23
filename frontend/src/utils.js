@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import $ from 'jquery';
 
 export function drawSVG(network_id) {
-	var divEle = $('#n' + network_id)[0].getBoundingClientRect();
+	// var divEle = $('#n' + network_id)[0].getBoundingClientRect();
 	d3.select('#svg' + network_id).selectAll("*").remove();
 	var svgEle = d3.select('#svg' + network_id);
 	svgEle.style("left", 0 + "px");
@@ -39,7 +39,7 @@ export function drawLinks(network_id, layers) {
 export function drawLinkBetweenLayers(network_id, layer1_id, layer2_id) {
 	d3.select('#svg' + network_id).selectAll("#g" + network_id + '_' + layer1_id + '_' + layer2_id).remove();
 	var svgEle = d3.select('#svg' + network_id);
-	var divEle = $('#n' + network_id)[0].getBoundingClientRect();
+	// var divEle = $('#n' + network_id)[0].getBoundingClientRect();
 	var neurons1 = svgEle.select('#g' + network_id + '_' + layer1_id).selectAll('rect').nodes();
 	var neurons2 = svgEle.select('#g' + network_id + '_' + layer2_id).selectAll('rect').nodes();
 	var group = svgEle.append("g").attr("id", 'g' + network_id + '_' + layer1_id + '_' + layer2_id);
@@ -65,4 +65,38 @@ export function getCurvePath(ele1, ele2) {
 	let px2 = (cx2-cx1)/2, py2 = (cy2-cy1)/2;
 	let px3 = (cx2-cx1), py3 = (cy2-cy1);
 	return "M " + px1 + " " + py1 + " q " + px2 + " " + py2 + " " + px3 + " " + py3;
+}
+
+export function sendNetwork(network_id) {
+	const lr = $('#lr' + network_id).val();
+	const rr = $('#rr' + network_id).val();
+	const afunc = $('#afunc' + network_id).val();
+	const rfunc = $('#rfunc' + network_id).val();
+	jsonRequest('GET', '/api/neuralnetwork', {
+		'activ_func': afunc,
+		'regul_func': rfunc,
+		'lr': lr,
+		'regul_rate': rr
+	},
+	function (response) {
+		// console.log(response);
+		alert(response);
+	},
+	function (response) {
+		// console.log(response);
+		alert(response);
+	});
+}
+
+function jsonRequest(method, url, data, successCallback, errorCallback) {
+    $.ajax({
+		headers: {
+			'Accept': 'application/json'
+		},
+		method: method,
+		data: method === 'GET' ? data : JSON.stringify(data),
+		url: url,
+		success: successCallback,
+		error: errorCallback
+    });
 }
