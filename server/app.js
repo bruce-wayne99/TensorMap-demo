@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 
 // API end points
 
-app.get('/api/neuralnetwork', networkController.getNetworks);
+app.get('/api/neuralnetwork', networkController.runNetwork);
 
 
 app.listen(port, () => {
