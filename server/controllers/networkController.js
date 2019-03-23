@@ -37,7 +37,7 @@ const buildNetwork = (layers, activ_func, regul_func, regul_rate, lr) => {
 			l2: regul_rate
 		});
 	}
-	else if(regul_func == null) {
+	else if(regul_func == 'None') {
 		regularizer = null;
 	}
 
@@ -85,21 +85,23 @@ async function trainModel(trainingData, outputData, model) {
 	}
 };
 
-function testModel(testingData, model) {
+async function testModel(testingData, outputData, model) {
 	console.log('....Testing Output....');
 	model.predict(testingData).print();
-	outTestData.print();
+	outputData.print();
 };
 
 async function runNetwork(req, res) {
+	console.log(req.query);
 	const layers = [10];
-	const activ_func = 'sigmoid';
-	const regul_func = 'l1';
-	const regul_rate = 0.01;
-	const lr = 0.01;
+	const activ_func = req.query.activ_func;
+	const regul_func = req.query.regul_func;
+	const regul_rate = parseFloat(req.query.regul_rate);
+	const lr = parseFloat(req.query.lr);
+	// console.log(layers, activ_func, regul_func, regul_rate, lr);
 	const model = buildNetwork(layers, activ_func, regul_func, regul_rate, lr);
 	await trainModel(trainingData, outputData, model);
-	await testModel(testingData, model);
+	await testModel(testingData, outTestData, model);
 	return res.status(200).json('Model training completed');
 };
 
