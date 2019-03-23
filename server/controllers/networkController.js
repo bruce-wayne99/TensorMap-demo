@@ -1,4 +1,22 @@
 const tf = require('@tensorflow/tfjs');
+const irisTraining = require('../datasets/iris_training.json');
+const irisTesting = require('../datasets/iris_testing.json');
+
+// Mapping the training data 130 samples
+const trainingData = tf.tensor2d(irisTraining.map(item=> [
+    item.sepal_length, item.sepal_width, item.petal_length, item.petal_width
+]), [130,4])
+
+const outputData = tf.tensor2d(irisTraining.map(item => [
+    item.species === 'setosa' ? 1 : 0,
+    item.species === 'virginica' ? 1 : 0,
+    item.species === 'versicolor' ? 1 : 0
+]), [130,3])
+
+// Mapping the testing data 14 samples
+const testingData = tf.tensor2d(irisTesting.map(item=> [
+    item.sepal_length, item.sepal_width, item.petal_length, item.petal_width
+]), [14,4])
 
 const buildNetwork = (layers, activ_func, regul_func, regul_rate, lr) => {
 	
@@ -26,7 +44,7 @@ const buildNetwork = (layers, activ_func, regul_func, regul_rate, lr) => {
 	}));
 
 	//Adding middle layers
-	for(var i = 1; i < layers.length; i++) {
+	for(let i = 1; i < layers.length; i++) {
 		model.add(tf.layers.dense({
 			inputShape: layers[i-1],
 			activation: activ_func,
@@ -39,7 +57,7 @@ const buildNetwork = (layers, activ_func, regul_func, regul_rate, lr) => {
 	model.add(tf.layers.dense({
 		inputShape: layers[layers.length - 1],
 		activation: 'softmax',
-		units: 2,
+		units: 3,
 		kernelRegularizer: regularizer
 	}));
 
@@ -53,14 +71,29 @@ const buildNetwork = (layers, activ_func, regul_func, regul_rate, lr) => {
 	return model;
 };
 
-exports.runNetwork = (req, res) => {
+async function trainModel(trainingData, outputData, model) {
+	console.log('......Loss History.......');
+	for(let i = 0; i < 40; i++){
+		let res = await model.fit(trainingData, outputData, {epochs: 3});
+		console.log(`Iteration ${i}: ${res.history.loss[0]}`);
+	}
+};
+
+function testModel(testingData, model) {
+	console.log('....Testing Output....');
+	model.predict(testingData).print();
+};
+
+async function runNetwork(req, res) {
 	const layers = [1, 2, 3, 4];
 	const activ_func = 'relu';
 	const regul_func = 'l1';
 	const regul_rate = 0.01;
 	const lr = 0.01;
 	const model = buildNetwork(layers, activ_func, regul_func, regul_rate, lr);
-	// trainModel(req, model);
-	// testModel(req, model);
-	return res.status(200).json('test-response');
+	await trainModel(trainingData, outputData, model);
+	await testModel(testingData, model);
+	return res.status(200).json('Model training completed');
 };
+
+exports.runNetwork = runNetwork;
